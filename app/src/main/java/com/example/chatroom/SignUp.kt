@@ -40,10 +40,14 @@ class SignUp : AppCompatActivity(), CoroutineScope {
 
             launch {
                 try {
-                    val userExists = Utils.checkUserExists(username).content.toString().toInt()
-                    if (userExists == 1) {
+                    val userExists = Utils.checkUserExists(username).readText().toBoolean()
+                    Toast.makeText(applicationContext, userExists.toString(), Toast.LENGTH_LONG).show()
+                    if (!userExists) {
                         signup(username, password)
                         Toast.makeText(applicationContext, "Registration completed successfully !", Toast.LENGTH_LONG)
+                            .show()
+                    } else {
+                        Toast.makeText(applicationContext, "Username already exists", Toast.LENGTH_LONG)
                             .show()
                     }
 
