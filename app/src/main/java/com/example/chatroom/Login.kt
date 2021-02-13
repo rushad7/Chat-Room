@@ -5,10 +5,6 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.google.gson.Gson
-import io.ktor.client.*
-import io.ktor.client.engine.android.*
-import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -20,7 +16,6 @@ import kotlin.coroutines.CoroutineContext
 class LogIn : AppCompatActivity(), CoroutineScope {
 
     //START COROUTINE
-    private val gson = Gson()
     private var job: Job = Job()
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main + job
@@ -36,11 +31,11 @@ class LogIn : AppCompatActivity(), CoroutineScope {
         //LOGIN USER ON BUTTON CLICK
         loginButton.setOnClickListener {
             val username = usernameField.text.toString()
-            val password = Utils.hashString("SHA-512", passwordField.text.toString())
+            val password = Utils.sha512(passwordField.text.toString())
 
             launch {
                 try {
-                    val loginSuccessful = login(username, password).readText().toBoolean()
+                    val loginSuccessful = Utils.sendRequest("login", username, password).readText().toBoolean()
                     if (loginSuccessful) {
                         Toast.makeText(applicationContext, "Logged in successfully", Toast.LENGTH_LONG)
                             .show()
@@ -56,23 +51,6 @@ class LogIn : AppCompatActivity(), CoroutineScope {
                     ).show()
                 }
             }
-        }
-    }
-
-    //LOGIN METHOD
-    private suspend fun login(username: String, password: String): HttpResponse {
-        //IMPLEMENT SESSION
-        val httpClient = HttpClient(Android) {
-            engine {
-                connectTimeout = 2000
-                socketTimeout = 2000
-            }
-        }
-
-        return httpClient.post("http://192.168.0.7:8000/login") {
-            val userinfo = Utils.UserInfo(username = username, password = password)
-            val postData = gson.toJson(userinfo)
-            body = postData
         }
     }
 }
