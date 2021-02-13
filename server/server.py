@@ -2,7 +2,6 @@ import sqlite3
 from sqlite3 import Error
 import pandas as pd
 from pydantic import BaseModel
-from typing import Optional
 from fastapi import FastAPI, status
 
 app = FastAPI()
@@ -10,7 +9,7 @@ app = FastAPI()
 
 class Data(BaseModel):
     username: str
-    password: Optional[str]
+    password: str
 
 
 def create_connection(path):
@@ -62,7 +61,6 @@ async def add_user(credentials: Data):
 async def check_user(credentials: Data):
     query = f"SELECT username FROM users WHERE username='{credentials.username}';"
     query_response = pd.read_sql_query(query, connection)
-    # user_exists: bool = ~bool(query_response.size == 0)
     user_exists: bool = not query_response.empty
     return user_exists
 
