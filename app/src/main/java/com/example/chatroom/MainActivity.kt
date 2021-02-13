@@ -5,13 +5,7 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.google.gson.annotations.SerializedName
 
-
-data class UserInfo(
-    @SerializedName("username") val username: String? = null,
-    @SerializedName("password") val password: String? = null
-)
 
 class MainActivity : AppCompatActivity() {
 
