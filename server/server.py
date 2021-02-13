@@ -68,9 +68,13 @@ async def check_user(credentials: Data):
 
 @app.post("/login", status_code=status.HTTP_200_OK)
 async def login(credentials: Data):
-    query = f"SELECT username, password FROM users WHERE username='{credentials.username}';"
-    query_response = pd.read_sql_query(query, connection)
-    user_password = query_response.get("password")[0]
-    if user_password == credentials.password:
-        return True
-    return False
+	try:
+		query = f"SELECT username, password FROM users WHERE username='{credentials.username}';"
+		query_response = pd.read_sql_query(query, connection)
+		user_password = query_response.get("password")[0]
+		if user_password == credentials.password:
+			return True
+		return False
+		
+	except: 
+		return False
