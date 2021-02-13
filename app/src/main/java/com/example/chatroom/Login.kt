@@ -51,7 +51,7 @@ class LogIn : AppCompatActivity(), CoroutineScope {
                 } catch (e: Exception) {
                     Toast.makeText(
                         applicationContext,
-                        "Oops!, something went wrong, please try again later",
+                        "Oops! Something went wrong, please try again later",
                         Toast.LENGTH_LONG
                     ).show()
                 }
