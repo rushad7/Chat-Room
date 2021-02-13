@@ -47,10 +47,4 @@ object Utils {
 
         return result.toString()
     }
-
-    data class Person (
-        val fnmae: String,
-        val lname: String
-            )
-
 }
