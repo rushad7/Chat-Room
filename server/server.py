@@ -51,7 +51,7 @@ connection = create_connection("user_db.sqlite")
 execute_query(connection, create_user_table_query)
 
 
-@app.post("/adduser", status_code=status.HTTP_201_CREATED)
+@app.post("/signup", status_code=status.HTTP_201_CREATED)
 async def add_user(credentials: Data):
     query = add_user_query(credentials.username, credentials.password)
     execute_query(connection, query)
@@ -65,3 +65,12 @@ async def check_user(credentials: Data):
     # user_exists: bool = ~bool(query_response.size == 0)
     user_exists: bool = not query_response.empty
     return user_exists
+
+@app.post("/login", status_code=status.HTTP_200_OK)
+async def login(credentials: Data):
+    query = f"SELECT username, password FROM users WHERE username='{credentials.username}';"
+    query_response = pd.read_sql_query(query, connection)
+    user_password = query_response.get("password")[0]
+    if user_password == credentials.password:
+        return True
+    return False
