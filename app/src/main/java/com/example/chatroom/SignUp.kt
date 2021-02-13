@@ -36,12 +36,11 @@ class SignUp : AppCompatActivity(), CoroutineScope {
         //REGISTER USER ON BUTTON CLICK
         signUpButton.setOnClickListener {
             val username = usernameField.text.toString()
-            val password = passwordField.text.toString()
+            val password = Utils.hashString("SHA-512", passwordField.text.toString())
 
             launch {
                 try {
                     val userExists = Utils.checkUserExists(username).readText().toBoolean()
-                    Toast.makeText(applicationContext, userExists.toString(), Toast.LENGTH_LONG).show()
                     if (!userExists) {
                         signup(username, password)
                         Toast.makeText(applicationContext, "Registration completed successfully !", Toast.LENGTH_LONG)
@@ -71,8 +70,8 @@ class SignUp : AppCompatActivity(), CoroutineScope {
             }
         }
 
-        return httpClient.post("http://192.168.0.7:8000/adduser") {
-            val userinfo = UserInfo(username = username, password = password)
+        return httpClient.post("http://192.168.0.7:8000/signup") {
+            val userinfo = Utils.UserInfo(username = username, password = password)
             val postData = gson.toJson(userinfo)
             body = postData
         }
