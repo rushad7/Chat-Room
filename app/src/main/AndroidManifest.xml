@@ -24,6 +24,8 @@
 
         <activity android:name=".LogIn" android:windowSoftInputMode="adjustResize"/>
         <activity android:name=".SignUp" android:windowSoftInputMode="adjustResize"/>
+        <activity android:name=".ChatPage"
+                  android:windowSoftInputMode="adjustPan"/>
 
     </application>
 
