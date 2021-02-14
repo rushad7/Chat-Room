@@ -1,5 +1,6 @@
 package com.example.chatroom
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
@@ -24,6 +25,8 @@ class LogIn : AppCompatActivity(), CoroutineScope {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.login_page)
 
+        val loginState = LoginState(this)
+
         val usernameField = findViewById<TextView>(R.id.usernameField)
         val passwordField = findViewById<TextView>(R.id.passwordField)
         val loginButton = findViewById<Button>(R.id.loginButton)
@@ -37,6 +40,9 @@ class LogIn : AppCompatActivity(), CoroutineScope {
                 try {
                     val loginSuccessful = Utils.sendRequest("login", username, password).readText().toBoolean()
                     if (loginSuccessful) {
+                        loginState.login()
+                        val chatIntent = Intent(this@LogIn, ChatPage::class.java)
+                        startActivity(chatIntent)
                         Toast.makeText(applicationContext, "Logged in successfully", Toast.LENGTH_LONG)
                             .show()
                     } else {
