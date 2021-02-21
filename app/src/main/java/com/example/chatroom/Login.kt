@@ -33,6 +33,7 @@ class LogIn : AppCompatActivity(), CoroutineScope {
 
         //LOGIN USER ON BUTTON CLICK
         loginButton.setOnClickListener {
+
             val username = usernameField.text.toString()
             val password = Utils.sha512(passwordField.text.toString())
 
@@ -46,7 +47,11 @@ class LogIn : AppCompatActivity(), CoroutineScope {
                         val chatIntent = Intent(this@LogIn, ChatPage::class.java)
                         startActivity(chatIntent)
                     } else {
-                        Toast.makeText(applicationContext, "Incorrect credentials, please try again later", Toast.LENGTH_LONG)
+                        Toast.makeText(
+                            applicationContext,
+                            "Incorrect credentials, please try again later",
+                            Toast.LENGTH_LONG
+                        )
                             .show()
                     }
                 } catch (e: Exception) {

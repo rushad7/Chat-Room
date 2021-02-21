@@ -36,6 +36,7 @@ class ChatPage : AppCompatActivity(), CoroutineScope {
         arrayAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, list)
 
         sendChatButton.setOnClickListener {
+
             val currentDateTime = LocalDateTime.now()
             val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
             val dateTime = currentDateTime.format(dateTimeFormatter).toString()
