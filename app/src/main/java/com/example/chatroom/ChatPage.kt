@@ -1,10 +1,7 @@
 package com.example.chatroom
 
 import android.os.Bundle
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.ListView
-import android.widget.TextView
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 
 class ChatPage: AppCompatActivity() {
@@ -16,6 +13,9 @@ class ChatPage: AppCompatActivity() {
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.chat_page)
+
+        val loginSettings = LoginSettings(this)
+        Toast.makeText(applicationContext, "Welcome ${loginSettings.getUsername()}", Toast.LENGTH_LONG).show()
 
         val chatBoxField = findViewById<TextView>(R.id.chatBoxField)
         val sendChatButton = findViewById<Button>(R.id.sendChatButton)

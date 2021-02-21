@@ -22,14 +22,14 @@ class LogIn : AppCompatActivity(), CoroutineScope {
         get() = Dispatchers.Main + job
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.login_page)
-
-        val loginState = LoginState(this)
 
         val usernameField = findViewById<TextView>(R.id.usernameField)
         val passwordField = findViewById<TextView>(R.id.passwordField)
         val loginButton = findViewById<Button>(R.id.loginButton)
+        val loginSettings = LoginSettings(this)
 
         //LOGIN USER ON BUTTON CLICK
         loginButton.setOnClickListener {
@@ -40,11 +40,11 @@ class LogIn : AppCompatActivity(), CoroutineScope {
                 try {
                     val loginSuccessful = Utils.sendRequest("login", username, password).readText().toBoolean()
                     if (loginSuccessful) {
-                        loginState.login()
+                        loginSettings.login(username, password)
+                        Toast.makeText(applicationContext, "Logged in successfully", Toast.LENGTH_SHORT)
+                            .show()
                         val chatIntent = Intent(this@LogIn, ChatPage::class.java)
                         startActivity(chatIntent)
-                        Toast.makeText(applicationContext, "Logged in successfully", Toast.LENGTH_LONG)
-                            .show()
                     } else {
                         Toast.makeText(applicationContext, "Incorrect credentials, please try again later", Toast.LENGTH_LONG)
                             .show()
