@@ -13,9 +13,15 @@ object Utils {
     private val gson = Gson()
 
     //USER CREDENTIALS CLASS
-    data class UserInfo(
+    data class UserCredentials(
         @SerializedName("username") val username: String,
         @SerializedName("password") val password: String
+    )
+
+    data class Message(
+        @SerializedName("sent_by") val username: String,
+        @SerializedName("date_time") val date_time: String,
+        @SerializedName("message") val message: String
     )
 
     //SHA-512 ENCODER METHOD
@@ -35,7 +41,7 @@ object Utils {
         return result.toString()
     }
 
-    //COMMON REQUEST METHOD
+    //COMMON LOG IN/OUT REQUEST METHOD
     suspend fun sendRequest(requestAction: String, username: String, password: String): HttpResponse {
         val httpClient = HttpClient(Android) {
             engine {
@@ -47,8 +53,24 @@ object Utils {
         val url = "http://192.168.0.7:8000/$requestAction"
 
         return httpClient.post(url) {
-            val userinfo = UserInfo(username = username, password = password)
+            val userinfo = UserCredentials(username, password)
             val postData = gson.toJson(userinfo)
+            body = postData
+        }
+    }
+
+    //POST MESSAGE METHOD
+    suspend fun sendMessage(username: String, date_time: String, message: String): HttpResponse {
+        val httpClient = HttpClient(Android) {
+            engine {
+                connectTimeout = 2000
+                socketTimeout = 2000
+            }
+        }
+
+        return httpClient.post("http://192.168.0.7:8000/sendmessage") {
+            val messageObj = Message(username, date_time, message)
+            val postData = gson.toJson(messageObj)
             body = postData
         }
     }
