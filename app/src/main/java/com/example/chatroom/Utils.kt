@@ -1,5 +1,7 @@
 package com.example.chatroom
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import io.ktor.client.*
@@ -7,6 +9,8 @@ import io.ktor.client.engine.android.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import java.security.MessageDigest
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 object Utils {
 
@@ -73,5 +77,12 @@ object Utils {
             val postData = gson.toJson(messageObj)
             body = postData
         }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun dateTimeString(): String {
+        val currentDateTime = LocalDateTime.now()
+        val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+        return currentDateTime.format(dateTimeFormatter).toString()
     }
 }
