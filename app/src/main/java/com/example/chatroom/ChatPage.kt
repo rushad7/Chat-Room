@@ -3,13 +3,15 @@ package com.example.chatroom
 import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import io.ktor.client.*
+import io.ktor.client.engine.android.*
+import io.ktor.client.features.websocket.*
 import io.ktor.client.statement.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
+import io.ktor.http.*
+import io.ktor.http.cio.websocket.*
+import io.ktor.network.selector.*
+import kotlinx.coroutines.*
+import okhttp3.*
 import kotlin.coroutines.CoroutineContext
 
 class ChatPage : AppCompatActivity(), CoroutineScope {
@@ -21,52 +23,90 @@ class ChatPage : AppCompatActivity(), CoroutineScope {
 
     private var list: ArrayList<String> = ArrayList()
     private lateinit var arrayAdapter: ArrayAdapter<String>
+    private lateinit var loginSettings: LoginSettings
+
+    private val client = OkHttpClient()
+    private val request: Request = Request.Builder().url("ws://192.168.0.7:8000/chat").build()
+
+    private lateinit var chatBoxField: TextView
+    private lateinit var sendChatButton: Button
+    private lateinit var chatView: ListView
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.chat_page)
 
-        val loginSettings = LoginSettings(this)
+        loginSettings = LoginSettings(this@ChatPage)
         Toast.makeText(applicationContext, "Welcome ${loginSettings.getUsername()}", Toast.LENGTH_LONG).show()
 
-        val chatBoxField = findViewById<TextView>(R.id.chatBoxField)
-        val sendChatButton = findViewById<Button>(R.id.sendChatButton)
-        val chatView = findViewById<ListView>(R.id.chatView)
+        chatBoxField = findViewById(R.id.chatBoxField)
+        sendChatButton = findViewById(R.id.sendChatButton)
+        chatView = findViewById(R.id.chatView)
+
         arrayAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, list)
+
+        chatWebSocket(loginSettings.getUsername().toString())
 
         sendChatButton.setOnClickListener {
 
-            val currentDateTime = LocalDateTime.now()
-            val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
-            val dateTime = currentDateTime.format(dateTimeFormatter).toString()
             val message = chatBoxField.text.toString()
 
             launch {
                 try {
-                    val response =
-                        Utils.sendMessage(loginSettings.getUsername().toString(), dateTime, message).readText()
-                            .toBoolean()
-                    if (!response) {
-                        Toast.makeText(
-                            this@ChatPage,
-                            "Unable to send message, please try again later",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
+                    chatWebSocket(loginSettings.getUsername().toString(), message)
                 } catch (e: Exception) {
                     Toast.makeText(
                         this@ChatPage,
-                        "Unable to send message, check your internet connection",
+                        "Oops! Something went wrong, check your internet connection",
                         Toast.LENGTH_LONG
                     ).show()
                 }
             }
-
-            list.add(message)
             chatBoxField.text = ""
-            arrayAdapter.notifyDataSetChanged()
-            chatView.adapter = arrayAdapter
         }
+    }
+
+    private fun chatWebSocket(username: String, message: String? = null) {
+
+        val webSocketListenerCoinPrice: WebSocketListener = object : WebSocketListener() {
+
+            override fun onMessage(webSocket: WebSocket, text: String) {
+                runOnUiThread(Runnable {
+                    list.add(text)
+                    arrayAdapter.notifyDataSetChanged()
+                    chatView.adapter = arrayAdapter
+                })
+            }
+
+            override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
+
+                val dateTime = Utils.dateTimeString()
+                webSocket.send("$username $dateTime $message Closing Connection")
+
+                runOnUiThread(Runnable {
+                    Toast.makeText(this@ChatPage, "Closing Connection", Toast.LENGTH_SHORT).show()
+                })
+                webSocket.close(1000, null)
+                webSocket.cancel()
+            }
+
+            override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
+                runOnUiThread(Runnable {
+                    Toast.makeText(this@ChatPage, "Connection closed : Code $code", Toast.LENGTH_SHORT).show()
+                })
+            }
+
+            override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
+                runOnUiThread(Runnable {
+                    Toast.makeText(this@ChatPage, "Connection Failed", Toast.LENGTH_SHORT).show()
+                })
+            }
+        }
+
+        val chatClient = client.newWebSocket(request, webSocketListenerCoinPrice)
+        if (message != null) chatClient.send(message)
+        //client.dispatcher.executorService.shutdown()
     }
 }
