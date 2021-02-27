@@ -1,20 +1,16 @@
 import sqlite3
 from sqlite3 import Error
 import pandas as pd
-from pydantic import BaseModel
-from fastapi import FastAPI, status
+from fastapi import FastAPI, status, WebSocket, WebSocketDisconnect
+
+from data_models import Message, UserCredentials
+from connection_manager import ConnectionManager
+
+import random
+import asyncio
 
 app = FastAPI()
-
-
-class UserCredentials(BaseModel):
-    username: str
-    password: str
-
-class Message(BaseModel):
-    sent_by: str
-    date_time: str
-    message: str
+manager = ConnectionManager()
 
 
 def create_connection(path):
@@ -107,3 +103,26 @@ async def send_message(message: Message):
         return True
     except:
         return False
+
+
+@app.websocket("/chat")
+async def chat_websocket(websocket: WebSocket):
+
+    async def send_message(message: str):
+        #while True:
+        await manager.send_message(message, websocket)
+        #await asyncio.sleep(3)
+
+    await manager.connect(websocket)
+
+    try:
+        while True:
+            data = await websocket.receive_text()
+            print(data)
+            
+            await send_message(data)
+            #loop = asyncio.get_event_loop()
+            #loop.create_task(send_message())
+
+    except WebSocketDisconnect:
+        manager.disconnect(websocket)
