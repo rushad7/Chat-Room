@@ -6,4 +6,7 @@
     <string name="password">Password</string>
     <string name="type_a_message">Type a message</string>
     <string name="send">Send</string>
+    <string name="chat_room">Chat Room</string>
+    <string name="check_your_internet_and_try_again">Check your Internet and try again</string>
+    <string name="no_internet_icon">no internet icon</string>
 </resources>

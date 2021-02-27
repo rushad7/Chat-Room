@@ -15,8 +15,9 @@
             android:usesCleartextTraffic="true" tools:targetApi="m">
 
         <activity
-                android:name=".MainActivity"
-                android:noHistory = "true">
+                android:name=".SplashScreen"
+                android:noHistory = "true"
+                android:theme = "@style/AppTheme.NoNavBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -24,6 +25,7 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".MainActivity" android:windowSoftInputMode="adjustResize"/>
         <activity android:name=".LogIn" android:windowSoftInputMode="adjustResize"/>
         <activity android:name=".SignUp" android:windowSoftInputMode="adjustResize"/>
         <activity android:name=".ChatPage"
