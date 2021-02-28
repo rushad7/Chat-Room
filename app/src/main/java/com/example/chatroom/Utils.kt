@@ -1,7 +1,5 @@
 package com.example.chatroom
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import io.ktor.client.*
@@ -9,8 +7,7 @@ import io.ktor.client.engine.android.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import java.security.MessageDigest
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
+
 
 object Utils {
 
@@ -20,12 +17,6 @@ object Utils {
     data class UserCredentials(
         @SerializedName("username") val username: String,
         @SerializedName("password") val password: String
-    )
-
-    data class Message(
-        @SerializedName("sent_by") val username: String,
-        @SerializedName("date_time") val date_time: String,
-        @SerializedName("message") val message: String
     )
 
     //SHA-512 ENCODER METHOD
@@ -54,35 +45,12 @@ object Utils {
             }
         }
 
-        val url = "http://192.168.0.7:8000/$requestAction"
+        val url = "http://chat-service.herokuapp.com/$requestAction"
 
         return httpClient.post(url) {
             val userinfo = UserCredentials(username, password)
             val postData = gson.toJson(userinfo)
             body = postData
         }
-    }
-
-    //POST MESSAGE METHOD
-    suspend fun sendMessage(username: String, date_time: String, message: String): HttpResponse {
-        val httpClient = HttpClient(Android) {
-            engine {
-                connectTimeout = 2000
-                socketTimeout = 2000
-            }
-        }
-
-        return httpClient.post("http://192.168.0.7:8000/sendmessage") {
-            val messageObj = Message(username, date_time, message)
-            val postData = gson.toJson(messageObj)
-            body = postData
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun dateTimeString(): String {
-        val currentDateTime = LocalDateTime.now()
-        val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
-        return currentDateTime.format(dateTimeFormatter).toString()
     }
 }
