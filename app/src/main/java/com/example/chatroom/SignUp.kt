@@ -1,5 +1,6 @@
 package com.example.chatroom
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
@@ -50,6 +51,9 @@ class SignUp : AppCompatActivity(), CoroutineScope {
                                 Toast.LENGTH_LONG
                             )
                                 .show()
+                            val loginIntent = Intent(this@SignUp, LogIn::class.java)
+                            startActivity(loginIntent)
+
                         } else {
                             Toast.makeText(applicationContext, "Username already exists", Toast.LENGTH_LONG)
                                 .show()
