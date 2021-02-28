@@ -26,7 +26,7 @@ class ChatPage : AppCompatActivity(), CoroutineScope {
     private lateinit var loginSettings: LoginSettings
 
     private val client = OkHttpClient()
-    private val request: Request = Request.Builder().url("ws://192.168.0.7:8000/chat").build()
+    private val request: Request = Request.Builder().url("ws://chat-service.herokuapp.com/chat").build()
 
     private lateinit var chatBoxField: TextView
     private lateinit var sendChatButton: Button
@@ -70,7 +70,7 @@ class ChatPage : AppCompatActivity(), CoroutineScope {
 
     private fun chatWebSocket(username: String, message: String? = null) {
 
-        val webSocketListenerCoinPrice: WebSocketListener = object : WebSocketListener() {
+        val webSocketListener: WebSocketListener = object : WebSocketListener() {
 
             override fun onMessage(webSocket: WebSocket, text: String) {
                 runOnUiThread(Runnable {
@@ -81,9 +81,6 @@ class ChatPage : AppCompatActivity(), CoroutineScope {
             }
 
             override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
-
-                val dateTime = Utils.dateTimeString()
-                webSocket.send("$username $dateTime $message Closing Connection")
 
                 runOnUiThread(Runnable {
                     Toast.makeText(this@ChatPage, "Closing Connection", Toast.LENGTH_SHORT).show()
@@ -105,8 +102,7 @@ class ChatPage : AppCompatActivity(), CoroutineScope {
             }
         }
 
-        val chatClient = client.newWebSocket(request, webSocketListenerCoinPrice)
-        if (message != null) chatClient.send(message)
-        //client.dispatcher.executorService.shutdown()
+        val chatClient = client.newWebSocket(request, webSocketListener)
+        if (message != null) chatClient.send("$username : $message")
     }
 }
