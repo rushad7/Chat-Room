@@ -42,7 +42,7 @@ class SignUp : AppCompatActivity(), CoroutineScope {
                 launch {
                     try {
                         //SIGNUP IF USER DOES NOT EXIST
-                        val userExists = Utils.sendRequest("checkuser", username, password).readText().toBoolean()
+                        val userExists = Utils.sendRequest("verify", username, password).readText().toBoolean()
                         if (!userExists) {
                             Utils.sendRequest("signup", username, password)
                             Toast.makeText(
