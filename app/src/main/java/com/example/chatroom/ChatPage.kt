@@ -1,5 +1,6 @@
 package com.example.chatroom
 
+
 import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -23,10 +24,8 @@ class ChatPage : AppCompatActivity(), CoroutineScope {
 
     private var list: ArrayList<String> = ArrayList()
     private lateinit var arrayAdapter: ArrayAdapter<String>
-    private lateinit var loginSettings: LoginSettings
 
-    private val client = OkHttpClient()
-    private val request: Request = Request.Builder().url("ws://chat-service.herokuapp.com/chat").build()
+    private lateinit var loginSettings: LoginSettings
 
     private lateinit var chatBoxField: TextView
     private lateinit var sendChatButton: Button
@@ -47,7 +46,7 @@ class ChatPage : AppCompatActivity(), CoroutineScope {
 
         arrayAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, list)
 
-        chatWebSocket(loginSettings.getUsername().toString())
+        chatWebSocket()
 
         sendChatButton.setOnClickListener {
 
@@ -55,7 +54,7 @@ class ChatPage : AppCompatActivity(), CoroutineScope {
 
             launch {
                 try {
-                    chatWebSocket(loginSettings.getUsername().toString(), message)
+                    chatWebSocket(message)
                 } catch (e: Exception) {
                     Toast.makeText(
                         this@ChatPage,
@@ -68,7 +67,15 @@ class ChatPage : AppCompatActivity(), CoroutineScope {
         }
     }
 
-    private fun chatWebSocket(username: String, message: String? = null) {
+    private fun chatWebSocket(message: String? = null) {
+
+        val userCredentials: Pair<String?, String?> = loginSettings.getUserInfo()
+        val username = userCredentials.first.toString()
+        val password = userCredentials.second.toString()
+        val hash = "${Utils.sha512(username)}$password"
+
+        val client = OkHttpClient()
+        val request: Request = Request.Builder().url("ws://chat-service.herokuapp.com/chat/${hash}").build()
 
         val webSocketListener: WebSocketListener = object : WebSocketListener() {
 
@@ -103,6 +110,12 @@ class ChatPage : AppCompatActivity(), CoroutineScope {
         }
 
         val chatClient = client.newWebSocket(request, webSocketListener)
-        if (message != null) chatClient.send("$username : $message")
+        if (message != null) {
+            chatClient.send("$username : $message")
+            runOnUiThread(Runnable {
+                chatView.transcriptMode = ListView.TRANSCRIPT_MODE_NORMAL
+                chatView.isStackFromBottom = true
+            })
+        }
     }
 }
