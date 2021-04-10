@@ -9,4 +9,10 @@
     <string name="chat_room">Chat Room</string>
     <string name="check_your_internet_and_try_again">Check your Internet and try again</string>
     <string name="no_internet_icon">no internet icon</string>
+    <string name="join_global_chat">Join Global Chat</string>
+    <string name="join_room">Join Room</string>
+    <string name="room_name">Room Name</string>
+    <string name="create_new_room">Create New Room</string>
+    <string name="logout">Logout</string>
+    <string name="create_room">Create Room</string>
 </resources>

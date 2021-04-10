@@ -4,7 +4,8 @@
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/actionBarColor</item>
         <item name="colorPrimaryDark">@color/actionBarColor</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowBackground">@color/background</item>
+        <item name="android:colorBackground">@color/background</item>
     </style>
 
     <style name="AppTheme.NoNavBar" parent="Theme.AppCompat.Light.NoActionBar">
