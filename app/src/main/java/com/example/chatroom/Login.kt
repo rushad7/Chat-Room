@@ -44,13 +44,13 @@ class LogIn : AppCompatActivity(), CoroutineScope {
                         loginSettings.login(username, password)
                         Toast.makeText(applicationContext, "Logged in successfully", Toast.LENGTH_SHORT)
                             .show()
-                        val chatIntent = Intent(this@LogIn, ChatPage::class.java)
-                        startActivity(chatIntent)
+                        val roomIntent = Intent(this@LogIn, Room::class.java)
+                        startActivity(roomIntent)
                     } else {
                         Toast.makeText(
                             applicationContext,
                             "Incorrect credentials, please try again later",
-                            Toast.LENGTH_LONG
+                            Toast.LENGTH_SHORT
                         )
                             .show()
                     }
@@ -58,7 +58,7 @@ class LogIn : AppCompatActivity(), CoroutineScope {
                     Toast.makeText(
                         applicationContext,
                         "Oops! Something went wrong, please try again later",
-                        Toast.LENGTH_LONG
+                        Toast.LENGTH_SHORT
                     ).show()
                 }
             }
