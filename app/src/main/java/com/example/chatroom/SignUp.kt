@@ -35,16 +35,15 @@ class SignUp : AppCompatActivity(), CoroutineScope {
             val password = Utils.sha512(passwordField.text.toString())
 
             //CHECK FIELD IS NOT EMPTY
-            if (username.isEmpty() or (password.length < 8)) {
-                Toast.makeText(applicationContext, "Please enter a valid username and password", Toast.LENGTH_LONG)
+            if (username.isEmpty() or (" " in username) or (password.length < 8)) {
+                Toast.makeText(applicationContext, "Please enter a valid username and password", Toast.LENGTH_SHORT)
                     .show()
             } else {
                 launch {
                     try {
                         //SIGNUP IF USER DOES NOT EXIST
-                        val userExists = Utils.sendRequest("verify", username, password).readText().toBoolean()
-                        if (!userExists) {
-                            Utils.sendRequest("signup", username, password)
+                        val status = Utils.sendRequest("signup", username, password).readText().toBoolean()
+                        if (status) {
                             Toast.makeText(
                                 applicationContext,
                                 "Registration completed successfully !",
@@ -55,7 +54,7 @@ class SignUp : AppCompatActivity(), CoroutineScope {
                             startActivity(loginIntent)
 
                         } else {
-                            Toast.makeText(applicationContext, "Username already exists", Toast.LENGTH_LONG)
+                            Toast.makeText(applicationContext, "Username already exists", Toast.LENGTH_SHORT)
                                 .show()
                         }
 
@@ -63,7 +62,7 @@ class SignUp : AppCompatActivity(), CoroutineScope {
                         Toast.makeText(
                             applicationContext,
                             "Oops! Something went wrong, please try again later",
-                            Toast.LENGTH_LONG
+                            Toast.LENGTH_SHORT
                         ).show()
                     }
                 }
