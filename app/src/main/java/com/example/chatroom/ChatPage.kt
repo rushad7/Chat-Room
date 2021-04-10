@@ -38,7 +38,6 @@ class ChatPage : AppCompatActivity(), CoroutineScope {
         setContentView(R.layout.chat_page)
 
         loginSettings = LoginSettings(this@ChatPage)
-        Toast.makeText(applicationContext, "Welcome ${loginSettings.getUsername()}", Toast.LENGTH_LONG).show()
 
         chatBoxField = findViewById(R.id.chatBoxField)
         sendChatButton = findViewById(R.id.sendChatButton)
@@ -46,28 +45,24 @@ class ChatPage : AppCompatActivity(), CoroutineScope {
 
         arrayAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, list)
 
-        chatWebSocket()
+        chatWebSocket("global")
 
         sendChatButton.setOnClickListener {
 
-            val message = chatBoxField.text.toString()
+            val broadcastMessage = "${loginSettings.getUsername().toString()}: ${chatBoxField.text}"
+            val displayMessage = "Me: ${chatBoxField.text}"
 
             launch {
-                try {
-                    chatWebSocket(message)
-                } catch (e: Exception) {
-                    Toast.makeText(
-                        this@ChatPage,
-                        "Oops! Something went wrong, check your internet connection",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
+                list.add(displayMessage)
+                arrayAdapter.notifyDataSetChanged()
+                chatView.adapter = arrayAdapter
+                chatWebSocket("global", broadcastMessage)
             }
             chatBoxField.text = ""
         }
     }
 
-    private fun chatWebSocket(message: String? = null) {
+    private fun chatWebSocket(room: String, message: String? = null) {
 
         val userCredentials: Pair<String?, String?> = loginSettings.getUserInfo()
         val username = userCredentials.first.toString()
@@ -75,7 +70,7 @@ class ChatPage : AppCompatActivity(), CoroutineScope {
         val hash = "${Utils.sha512(username)}$password"
 
         val client = OkHttpClient()
-        val request: Request = Request.Builder().url("ws://chat-service.herokuapp.com/chat/${hash}").build()
+        val request: Request = Request.Builder().url("ws://chat-service.herokuapp.com/chat/${room}/${hash}").build()
 
         val webSocketListener: WebSocketListener = object : WebSocketListener() {
 
@@ -104,14 +99,18 @@ class ChatPage : AppCompatActivity(), CoroutineScope {
 
             override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
                 runOnUiThread(Runnable {
-                    Toast.makeText(this@ChatPage, "Connection Failed", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this@ChatPage,
+                        "Connection failed, message will be sent when you are connected to the internet",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 })
             }
         }
 
         val chatClient = client.newWebSocket(request, webSocketListener)
         if (message != null) {
-            chatClient.send("$username : $message")
+            chatClient.send("$message")
             runOnUiThread(Runnable {
                 chatView.transcriptMode = ListView.TRANSCRIPT_MODE_NORMAL
                 chatView.isStackFromBottom = true
