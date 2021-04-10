@@ -15,7 +15,7 @@ class MainActivity : AppCompatActivity() {
 
         val loginSettings = LoginSettings(this@MainActivity)
         val isLoggedIn = loginSettings.getState()
-        val chatIntent = Intent(this, ChatPage::class.java)
+        val roomIntent = Intent(this, Room::class.java)
 
             try {
                 if (isLoggedIn) {
@@ -24,7 +24,7 @@ class MainActivity : AppCompatActivity() {
                     val password = userCredentials.second
 
                         if (username != null && password != null) {
-                            startActivity(chatIntent)
+                            startActivity(roomIntent)
                         }
 
                 } else {
