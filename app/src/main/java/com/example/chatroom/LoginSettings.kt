@@ -17,7 +17,7 @@ class LoginSettings(context: Context) {
         editor.apply()
     }
 
-    fun logout(username: String, password: String) {
+    fun logout() {
         editor.clear()
         editor.apply()
     }
