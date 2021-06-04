@@ -15,4 +15,7 @@
     <string name="create_new_room">Create New Room</string>
     <string name="logout">Logout</string>
     <string name="create_room">Create Room</string>
+    <string name="title_activity_room_lobby">RoomLobby</string>
+    <string name="tab_text_1">Tab 1</string>
+    <string name="tab_text_2">Tab 2</string>
 </resources>
